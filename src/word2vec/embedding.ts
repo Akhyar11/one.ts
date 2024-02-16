@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from "fs";
 import * as mj from "mathjs";
 import { activation } from "../activation/interfaces";
 import calculateActivation from "./calculateActivation";
+import { cosineSimilarity } from "../utils/cosineSimilarity";
 
 export default class Embedding {
   vectorSize: number;
@@ -43,6 +44,39 @@ export default class Embedding {
       this.corpus[word] = this.createVector(this.index);
       this.corpusSave[word] = this.corpus[word].toArray();
       this.index++;
+    }
+  }
+
+  wordSimilarity(word: string, topn: number = 10) {
+    const input = this.getVector(word);
+    const result = [];
+    for (let word2 in this.corpus) {
+      const target = this.getVector(word2);
+      const similar = cosineSimilarity(target, input);
+      if (word !== word2) result.push({ key: word2, similarity: similar });
+    }
+    const similarity = result.sort((a, b) => {
+      return b.similarity - a.similarity;
+    });
+
+    for (let i = 0; i < topn; i++) {
+      console.log(similarity[i]);
+    }
+  }
+
+  vectorSimilarity(vector: mj.Matrix, topn: number = 10) {
+    const result = [];
+    for (let word2 in this.corpus) {
+      const target = this.getVector(word2);
+      const similar = cosineSimilarity(target, vector);
+      result.push({ key: word2, similarity: similar });
+    }
+    const similarity = result.sort((a, b) => {
+      return b.similarity - a.similarity;
+    });
+
+    for (let i = 0; i < topn; i++) {
+      console.log(similarity[i]);
     }
   }
 

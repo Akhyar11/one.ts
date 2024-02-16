@@ -68,6 +68,8 @@ export default class RNN {
 
   predict(X_series: mj.Matrix[]): mj.Matrix {
     let pred = mj.matrix();
+    this.currentHidden = mj.matrix(mj.zeros([this.hiddenNodes, 1]));
+
     for (let X of X_series) {
       let inputs = mj.concat(mj.flatten(X), mj.flatten(this.currentHidden));
       inputs = mj.reshape(inputs, [this.inputNodes + this.hiddenNodes, 1]);
